@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Descarga de Archivos</title>
+    <!-- Enlace a Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        padding: 20px;
+      }
+      .message {
+        margin-top: 20px;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">Descarga de Archivos</h1>
+      <p class="text-center">
+        Introduce la URL de la carpeta que deseas descargar:
+      </p>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          id="folderUrl"
+          placeholder="URL de la carpeta"
+        />
+      </div>
+      <button id="downloadBtn" class="btn btn-success btn-block">
+        Descargar Archivos
+      </button>
+      <div class="message text-center" id="message"></div>
+    </div>
+
+    <!-- Enlace a jQuery y Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", async () => {
+          const folderUrl = document.getElementById("folderUrl").value;
+          const messageDiv = document.getElementById("message");
+
+          if (!folderUrl) {
+            messageDiv.textContent = "Por favor, introduce una URL válida.";
+            return;
+          }
+
+          try {
+            const response = await fetch("http://localhost:3000/download-url", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ folderUrl }),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              messageDiv.textContent =
+                errorData.error || "Error al descargar los archivos.";
+            } else {
+              // Forzar la descarga del ZIP
+              const blob = await response.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "archivos.zip";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              messageDiv.textContent = "Descarga iniciada...";
+            }
+          } catch (error) {
+            messageDiv.textContent = "Error de conexión: " + error.message;
+          }
+        });
+    </script>
+  </body>
+</html>
