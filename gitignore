@@ -1,0 +1,10 @@
+# Ignorar la carpeta node_modules, que contiene dependencias instaladas
+node_modules
+
+# Ignorar archivos de configuración o claves de entorno
+.env
+
+# Ignorar carpetas de logs o archivos de debugging
+logs
+*.log
+npm-debug.log*
